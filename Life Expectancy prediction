@@ -1,0 +1,823 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "e0efd584",
+   "metadata": {
+    "_cell_guid": "b1076dfc-b9ad-4769-8c92-a6c4dae69d19",
+    "_uuid": "8f2839f25d086af736a60e9eeb907d3b93b6e0e5",
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:06:59.803122Z",
+     "iopub.status.busy": "2024-09-07T04:06:59.802653Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.362853Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.360814Z"
+    },
+    "papermill": {
+     "duration": 0.573514,
+     "end_time": "2024-09-07T04:07:00.365722",
+     "exception": false,
+     "start_time": "2024-09-07T04:06:59.792208",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "/kaggle/input/life-expectancy-who-updated/Life-Expectancy-Data-Updated.csv\n"
+     ]
+    }
+   ],
+   "source": [
+    "# This Python 3 environment comes with many helpful analytics libraries installed\n",
+    "# It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python\n",
+    "# For example, here's several helpful packages to load\n",
+    "\n",
+    "import numpy as np # linear algebra\n",
+    "import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)\n",
+    "\n",
+    "# Input data files are available in the read-only \"../input/\" directory\n",
+    "# For example, running this (by clicking run or pressing Shift+Enter) will list all files under the input directory\n",
+    "\n",
+    "import os\n",
+    "for dirname, _, filenames in os.walk('/kaggle/input'):\n",
+    "    for filename in filenames:\n",
+    "        print(os.path.join(dirname, filename))\n",
+    "\n",
+    "# You can write up to 20GB to the current directory (/kaggle/working/) that gets preserved as output when you create a version using \"Save & Run All\" \n",
+    "# You can also write temporary files to /kaggle/temp/, but they won't be saved outside of the current session"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "80df3c82",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.382398Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.381679Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.389038Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.387527Z"
+    },
+    "papermill": {
+     "duration": 0.019732,
+     "end_time": "2024-09-07T04:07:00.392672",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.372940",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "# Suppress warnings\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "fb0b21d6",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.408393Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.407941Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.452994Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.451488Z"
+    },
+    "papermill": {
+     "duration": 0.056613,
+     "end_time": "2024-09-07T04:07:00.456499",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.399886",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "data = pd.read_csv('/kaggle/input/life-expectancy-who-updated/Life-Expectancy-Data-Updated.csv')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "e49cb12d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.472143Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.471706Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.496203Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.494799Z"
+    },
+    "papermill": {
+     "duration": 0.037233,
+     "end_time": "2024-09-07T04:07:00.500571",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.463338",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Country                        0\n",
+       "Region                         0\n",
+       "Year                           0\n",
+       "Infant_deaths                  0\n",
+       "Under_five_deaths              0\n",
+       "Adult_mortality                0\n",
+       "Alcohol_consumption            0\n",
+       "Hepatitis_B                    0\n",
+       "Measles                        0\n",
+       "BMI                            0\n",
+       "Polio                          0\n",
+       "Diphtheria                     0\n",
+       "Incidents_HIV                  0\n",
+       "GDP_per_capita                 0\n",
+       "Population_mln                 0\n",
+       "Thinness_ten_nineteen_years    0\n",
+       "Thinness_five_nine_years       0\n",
+       "Schooling                      0\n",
+       "Economy_status_Developed       0\n",
+       "Economy_status_Developing      0\n",
+       "Life_expectancy                0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 4,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "6eb42f6c",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.517050Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.516622Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.568083Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.565593Z"
+    },
+    "papermill": {
+     "duration": 0.064471,
+     "end_time": "2024-09-07T04:07:00.572803",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.508332",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Country</th>\n",
+       "      <th>Region</th>\n",
+       "      <th>Year</th>\n",
+       "      <th>Infant_deaths</th>\n",
+       "      <th>Under_five_deaths</th>\n",
+       "      <th>Adult_mortality</th>\n",
+       "      <th>Alcohol_consumption</th>\n",
+       "      <th>Hepatitis_B</th>\n",
+       "      <th>Measles</th>\n",
+       "      <th>BMI</th>\n",
+       "      <th>...</th>\n",
+       "      <th>Diphtheria</th>\n",
+       "      <th>Incidents_HIV</th>\n",
+       "      <th>GDP_per_capita</th>\n",
+       "      <th>Population_mln</th>\n",
+       "      <th>Thinness_ten_nineteen_years</th>\n",
+       "      <th>Thinness_five_nine_years</th>\n",
+       "      <th>Schooling</th>\n",
+       "      <th>Economy_status_Developed</th>\n",
+       "      <th>Economy_status_Developing</th>\n",
+       "      <th>Life_expectancy</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Turkiye</td>\n",
+       "      <td>Middle East</td>\n",
+       "      <td>2015</td>\n",
+       "      <td>11.1</td>\n",
+       "      <td>13.0</td>\n",
+       "      <td>105.8240</td>\n",
+       "      <td>1.32</td>\n",
+       "      <td>97</td>\n",
+       "      <td>65</td>\n",
+       "      <td>27.8</td>\n",
+       "      <td>...</td>\n",
+       "      <td>97</td>\n",
+       "      <td>0.08</td>\n",
+       "      <td>11006</td>\n",
+       "      <td>78.53</td>\n",
+       "      <td>4.9</td>\n",
+       "      <td>4.8</td>\n",
+       "      <td>7.8</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>76.5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Spain</td>\n",
+       "      <td>European Union</td>\n",
+       "      <td>2015</td>\n",
+       "      <td>2.7</td>\n",
+       "      <td>3.3</td>\n",
+       "      <td>57.9025</td>\n",
+       "      <td>10.35</td>\n",
+       "      <td>97</td>\n",
+       "      <td>94</td>\n",
+       "      <td>26.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>97</td>\n",
+       "      <td>0.09</td>\n",
+       "      <td>25742</td>\n",
+       "      <td>46.44</td>\n",
+       "      <td>0.6</td>\n",
+       "      <td>0.5</td>\n",
+       "      <td>9.7</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>82.8</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>India</td>\n",
+       "      <td>Asia</td>\n",
+       "      <td>2007</td>\n",
+       "      <td>51.5</td>\n",
+       "      <td>67.9</td>\n",
+       "      <td>201.0765</td>\n",
+       "      <td>1.57</td>\n",
+       "      <td>60</td>\n",
+       "      <td>35</td>\n",
+       "      <td>21.2</td>\n",
+       "      <td>...</td>\n",
+       "      <td>64</td>\n",
+       "      <td>0.13</td>\n",
+       "      <td>1076</td>\n",
+       "      <td>1183.21</td>\n",
+       "      <td>27.1</td>\n",
+       "      <td>28.0</td>\n",
+       "      <td>5.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>65.4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Guyana</td>\n",
+       "      <td>South America</td>\n",
+       "      <td>2006</td>\n",
+       "      <td>32.8</td>\n",
+       "      <td>40.5</td>\n",
+       "      <td>222.1965</td>\n",
+       "      <td>5.68</td>\n",
+       "      <td>93</td>\n",
+       "      <td>74</td>\n",
+       "      <td>25.3</td>\n",
+       "      <td>...</td>\n",
+       "      <td>93</td>\n",
+       "      <td>0.79</td>\n",
+       "      <td>4146</td>\n",
+       "      <td>0.75</td>\n",
+       "      <td>5.7</td>\n",
+       "      <td>5.5</td>\n",
+       "      <td>7.9</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>67.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Israel</td>\n",
+       "      <td>Middle East</td>\n",
+       "      <td>2012</td>\n",
+       "      <td>3.4</td>\n",
+       "      <td>4.3</td>\n",
+       "      <td>57.9510</td>\n",
+       "      <td>2.89</td>\n",
+       "      <td>97</td>\n",
+       "      <td>89</td>\n",
+       "      <td>27.0</td>\n",
+       "      <td>...</td>\n",
+       "      <td>94</td>\n",
+       "      <td>0.08</td>\n",
+       "      <td>33995</td>\n",
+       "      <td>7.91</td>\n",
+       "      <td>1.2</td>\n",
+       "      <td>1.1</td>\n",
+       "      <td>12.8</td>\n",
+       "      <td>1</td>\n",
+       "      <td>0</td>\n",
+       "      <td>81.7</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "<p>5 rows × 21 columns</p>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   Country          Region  Year  Infant_deaths  Under_five_deaths  \\\n",
+       "0  Turkiye     Middle East  2015           11.1               13.0   \n",
+       "1    Spain  European Union  2015            2.7                3.3   \n",
+       "2    India            Asia  2007           51.5               67.9   \n",
+       "3   Guyana   South America  2006           32.8               40.5   \n",
+       "4   Israel     Middle East  2012            3.4                4.3   \n",
+       "\n",
+       "   Adult_mortality  Alcohol_consumption  Hepatitis_B  Measles   BMI  ...  \\\n",
+       "0         105.8240                 1.32           97       65  27.8  ...   \n",
+       "1          57.9025                10.35           97       94  26.0  ...   \n",
+       "2         201.0765                 1.57           60       35  21.2  ...   \n",
+       "3         222.1965                 5.68           93       74  25.3  ...   \n",
+       "4          57.9510                 2.89           97       89  27.0  ...   \n",
+       "\n",
+       "   Diphtheria  Incidents_HIV  GDP_per_capita  Population_mln  \\\n",
+       "0          97           0.08           11006           78.53   \n",
+       "1          97           0.09           25742           46.44   \n",
+       "2          64           0.13            1076         1183.21   \n",
+       "3          93           0.79            4146            0.75   \n",
+       "4          94           0.08           33995            7.91   \n",
+       "\n",
+       "   Thinness_ten_nineteen_years  Thinness_five_nine_years  Schooling  \\\n",
+       "0                          4.9                       4.8        7.8   \n",
+       "1                          0.6                       0.5        9.7   \n",
+       "2                         27.1                      28.0        5.0   \n",
+       "3                          5.7                       5.5        7.9   \n",
+       "4                          1.2                       1.1       12.8   \n",
+       "\n",
+       "   Economy_status_Developed  Economy_status_Developing  Life_expectancy  \n",
+       "0                         0                          1             76.5  \n",
+       "1                         1                          0             82.8  \n",
+       "2                         0                          1             65.4  \n",
+       "3                         0                          1             67.0  \n",
+       "4                         1                          0             81.7  \n",
+       "\n",
+       "[5 rows x 21 columns]"
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "329bdc2d",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.589971Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.589400Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.599687Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.598276Z"
+    },
+    "papermill": {
+     "duration": 0.023034,
+     "end_time": "2024-09-07T04:07:00.603058",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.580024",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['Country', 'Region', 'Year', 'Infant_deaths', 'Under_five_deaths',\n",
+       "       'Adult_mortality', 'Alcohol_consumption', 'Hepatitis_B', 'Measles',\n",
+       "       'BMI', 'Polio', 'Diphtheria', 'Incidents_HIV', 'GDP_per_capita',\n",
+       "       'Population_mln', 'Thinness_ten_nineteen_years',\n",
+       "       'Thinness_five_nine_years', 'Schooling', 'Economy_status_Developed',\n",
+       "       'Economy_status_Developing', 'Life_expectancy'],\n",
+       "      dtype='object')"
+      ]
+     },
+     "execution_count": 6,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "data.columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "259ab198",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.619926Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.619418Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.629942Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.628204Z"
+    },
+    "papermill": {
+     "duration": 0.022567,
+     "end_time": "2024-09-07T04:07:00.633621",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.611054",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "sample = data.copy()\n",
+    "sample = sample.drop(columns=['Year'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "99bc4641",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.649354Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.648918Z",
+     "iopub.status.idle": "2024-09-07T04:07:00.657521Z",
+     "shell.execute_reply": "2024-09-07T04:07:00.656186Z"
+    },
+    "papermill": {
+     "duration": 0.019991,
+     "end_time": "2024-09-07T04:07:00.660631",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.640640",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "X = sample.drop(columns=['Life_expectancy'])\n",
+    "y = sample['Life_expectancy']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "c2cdbd60",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:00.679780Z",
+     "iopub.status.busy": "2024-09-07T04:07:00.679270Z",
+     "iopub.status.idle": "2024-09-07T04:07:02.399929Z",
+     "shell.execute_reply": "2024-09-07T04:07:02.398602Z"
+    },
+    "papermill": {
+     "duration": 1.73437,
+     "end_time": "2024-09-07T04:07:02.403212",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:00.668842",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "from sklearn.preprocessing import OrdinalEncoder\n",
+    "ord_enc = OrdinalEncoder()\n",
+    "ord_col = ['Country','Region']\n",
+    "\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "std_enc = StandardScaler()\n",
+    "std_col = X.drop(columns=['Country','Region']).columns"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "2f580033",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:02.420682Z",
+     "iopub.status.busy": "2024-09-07T04:07:02.420001Z",
+     "iopub.status.idle": "2024-09-07T04:07:02.972421Z",
+     "shell.execute_reply": "2024-09-07T04:07:02.971031Z"
+    },
+    "papermill": {
+     "duration": 0.565145,
+     "end_time": "2024-09-07T04:07:02.975756",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:02.410611",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "from sklearn.ensemble import RandomForestRegressor\n",
+    "from sklearn.model_selection import train_test_split\n",
+    "from sklearn.metrics import r2_score,mean_squared_error\n",
+    "from sklearn.compose import ColumnTransformer\n",
+    "from sklearn.pipeline import Pipeline\n",
+    "\n",
+    "transformer = ColumnTransformer(transformers=[\n",
+    "    ('ordinal',ord_enc,ord_col),\n",
+    "    ('standard',std_enc,std_col)\n",
+    "],remainder=\"drop\"\n",
+    ")\n",
+    "\n",
+    "rf = RandomForestRegressor(n_estimators=100 , criterion = 'squared_error' , max_depth = 1000 , min_samples_leaf=1)\n",
+    "\n",
+    "pipeline = Pipeline(steps=[\n",
+    "    ('transformer',transformer),\n",
+    "    ('random_forest',rf)\n",
+    "])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "bf9d4fc3",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:02.992877Z",
+     "iopub.status.busy": "2024-09-07T04:07:02.991358Z",
+     "iopub.status.idle": "2024-09-07T04:07:05.367329Z",
+     "shell.execute_reply": "2024-09-07T04:07:05.365782Z"
+    },
+    "papermill": {
+     "duration": 2.387285,
+     "end_time": "2024-09-07T04:07:05.370345",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:02.983060",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: \"▸\";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: \"▾\";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: \"\";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: \"\";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id=\"sk-container-id-1\" class=\"sk-top-container\"><div class=\"sk-text-repr-fallback\"><pre>Pipeline(steps=[(&#x27;transformer&#x27;,\n",
+       "                 ColumnTransformer(transformers=[(&#x27;ordinal&#x27;, OrdinalEncoder(),\n",
+       "                                                  [&#x27;Country&#x27;, &#x27;Region&#x27;]),\n",
+       "                                                 (&#x27;standard&#x27;, StandardScaler(),\n",
+       "                                                  Index([&#x27;Infant_deaths&#x27;, &#x27;Under_five_deaths&#x27;, &#x27;Adult_mortality&#x27;,\n",
+       "       &#x27;Alcohol_consumption&#x27;, &#x27;Hepatitis_B&#x27;, &#x27;Measles&#x27;, &#x27;BMI&#x27;, &#x27;Polio&#x27;,\n",
+       "       &#x27;Diphtheria&#x27;, &#x27;Incidents_HIV&#x27;, &#x27;GDP_per_capita&#x27;, &#x27;Population_mln&#x27;,\n",
+       "       &#x27;Thinness_ten_nineteen_years&#x27;, &#x27;Thinness_five_nine_years&#x27;, &#x27;Schooling&#x27;,\n",
+       "       &#x27;Economy_status_Developed&#x27;, &#x27;Economy_status_Developing&#x27;],\n",
+       "      dtype=&#x27;object&#x27;))])),\n",
+       "                (&#x27;random_forest&#x27;, RandomForestRegressor(max_depth=1000))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class=\"sk-container\" hidden><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-1\" type=\"checkbox\" ><label for=\"sk-estimator-id-1\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">Pipeline</label><div class=\"sk-toggleable__content\"><pre>Pipeline(steps=[(&#x27;transformer&#x27;,\n",
+       "                 ColumnTransformer(transformers=[(&#x27;ordinal&#x27;, OrdinalEncoder(),\n",
+       "                                                  [&#x27;Country&#x27;, &#x27;Region&#x27;]),\n",
+       "                                                 (&#x27;standard&#x27;, StandardScaler(),\n",
+       "                                                  Index([&#x27;Infant_deaths&#x27;, &#x27;Under_five_deaths&#x27;, &#x27;Adult_mortality&#x27;,\n",
+       "       &#x27;Alcohol_consumption&#x27;, &#x27;Hepatitis_B&#x27;, &#x27;Measles&#x27;, &#x27;BMI&#x27;, &#x27;Polio&#x27;,\n",
+       "       &#x27;Diphtheria&#x27;, &#x27;Incidents_HIV&#x27;, &#x27;GDP_per_capita&#x27;, &#x27;Population_mln&#x27;,\n",
+       "       &#x27;Thinness_ten_nineteen_years&#x27;, &#x27;Thinness_five_nine_years&#x27;, &#x27;Schooling&#x27;,\n",
+       "       &#x27;Economy_status_Developed&#x27;, &#x27;Economy_status_Developing&#x27;],\n",
+       "      dtype=&#x27;object&#x27;))])),\n",
+       "                (&#x27;random_forest&#x27;, RandomForestRegressor(max_depth=1000))])</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item sk-dashed-wrapped\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-2\" type=\"checkbox\" ><label for=\"sk-estimator-id-2\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">transformer: ColumnTransformer</label><div class=\"sk-toggleable__content\"><pre>ColumnTransformer(transformers=[(&#x27;ordinal&#x27;, OrdinalEncoder(),\n",
+       "                                 [&#x27;Country&#x27;, &#x27;Region&#x27;]),\n",
+       "                                (&#x27;standard&#x27;, StandardScaler(),\n",
+       "                                 Index([&#x27;Infant_deaths&#x27;, &#x27;Under_five_deaths&#x27;, &#x27;Adult_mortality&#x27;,\n",
+       "       &#x27;Alcohol_consumption&#x27;, &#x27;Hepatitis_B&#x27;, &#x27;Measles&#x27;, &#x27;BMI&#x27;, &#x27;Polio&#x27;,\n",
+       "       &#x27;Diphtheria&#x27;, &#x27;Incidents_HIV&#x27;, &#x27;GDP_per_capita&#x27;, &#x27;Population_mln&#x27;,\n",
+       "       &#x27;Thinness_ten_nineteen_years&#x27;, &#x27;Thinness_five_nine_years&#x27;, &#x27;Schooling&#x27;,\n",
+       "       &#x27;Economy_status_Developed&#x27;, &#x27;Economy_status_Developing&#x27;],\n",
+       "      dtype=&#x27;object&#x27;))])</pre></div></div></div><div class=\"sk-parallel\"><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-3\" type=\"checkbox\" ><label for=\"sk-estimator-id-3\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">ordinal</label><div class=\"sk-toggleable__content\"><pre>[&#x27;Country&#x27;, &#x27;Region&#x27;]</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-4\" type=\"checkbox\" ><label for=\"sk-estimator-id-4\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">OrdinalEncoder</label><div class=\"sk-toggleable__content\"><pre>OrdinalEncoder()</pre></div></div></div></div></div></div><div class=\"sk-parallel-item\"><div class=\"sk-item\"><div class=\"sk-label-container\"><div class=\"sk-label sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-5\" type=\"checkbox\" ><label for=\"sk-estimator-id-5\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">standard</label><div class=\"sk-toggleable__content\"><pre>Index([&#x27;Infant_deaths&#x27;, &#x27;Under_five_deaths&#x27;, &#x27;Adult_mortality&#x27;,\n",
+       "       &#x27;Alcohol_consumption&#x27;, &#x27;Hepatitis_B&#x27;, &#x27;Measles&#x27;, &#x27;BMI&#x27;, &#x27;Polio&#x27;,\n",
+       "       &#x27;Diphtheria&#x27;, &#x27;Incidents_HIV&#x27;, &#x27;GDP_per_capita&#x27;, &#x27;Population_mln&#x27;,\n",
+       "       &#x27;Thinness_ten_nineteen_years&#x27;, &#x27;Thinness_five_nine_years&#x27;, &#x27;Schooling&#x27;,\n",
+       "       &#x27;Economy_status_Developed&#x27;, &#x27;Economy_status_Developing&#x27;],\n",
+       "      dtype=&#x27;object&#x27;)</pre></div></div></div><div class=\"sk-serial\"><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-6\" type=\"checkbox\" ><label for=\"sk-estimator-id-6\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">StandardScaler</label><div class=\"sk-toggleable__content\"><pre>StandardScaler()</pre></div></div></div></div></div></div></div></div><div class=\"sk-item\"><div class=\"sk-estimator sk-toggleable\"><input class=\"sk-toggleable__control sk-hidden--visually\" id=\"sk-estimator-id-7\" type=\"checkbox\" ><label for=\"sk-estimator-id-7\" class=\"sk-toggleable__label sk-toggleable__label-arrow\">RandomForestRegressor</label><div class=\"sk-toggleable__content\"><pre>RandomForestRegressor(max_depth=1000)</pre></div></div></div></div></div></div></div>"
+      ],
+      "text/plain": [
+       "Pipeline(steps=[('transformer',\n",
+       "                 ColumnTransformer(transformers=[('ordinal', OrdinalEncoder(),\n",
+       "                                                  ['Country', 'Region']),\n",
+       "                                                 ('standard', StandardScaler(),\n",
+       "                                                  Index(['Infant_deaths', 'Under_five_deaths', 'Adult_mortality',\n",
+       "       'Alcohol_consumption', 'Hepatitis_B', 'Measles', 'BMI', 'Polio',\n",
+       "       'Diphtheria', 'Incidents_HIV', 'GDP_per_capita', 'Population_mln',\n",
+       "       'Thinness_ten_nineteen_years', 'Thinness_five_nine_years', 'Schooling',\n",
+       "       'Economy_status_Developed', 'Economy_status_Developing'],\n",
+       "      dtype='object'))])),\n",
+       "                ('random_forest', RandomForestRegressor(max_depth=1000))])"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)\n",
+    "\n",
+    "#Training the model\n",
+    "pipeline.fit(X_train,y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "092cc5cb",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:05.390778Z",
+     "iopub.status.busy": "2024-09-07T04:07:05.390135Z",
+     "iopub.status.idle": "2024-09-07T04:07:05.430009Z",
+     "shell.execute_reply": "2024-09-07T04:07:05.428138Z"
+    },
+    "papermill": {
+     "duration": 0.054226,
+     "end_time": "2024-09-07T04:07:05.433068",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:05.378842",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The r2 score for the prediction is : 1.00\n",
+      "The mean squared error for the prediction is : 0.23\n"
+     ]
+    }
+   ],
+   "source": [
+    "y_pred = pipeline.predict(X_test)\n",
+    "\n",
+    "r2 = r2_score(y_test,y_pred)\n",
+    "mse = mean_squared_error(y_test,y_pred)\n",
+    "\n",
+    "print(\"The r2 score for the prediction is : {0:.2f}\".format(r2))\n",
+    "print(\"The mean squared error for the prediction is : {0:.2f}\".format(mse))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "96abd212",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:05.450153Z",
+     "iopub.status.busy": "2024-09-07T04:07:05.449677Z",
+     "iopub.status.idle": "2024-09-07T04:07:05.459339Z",
+     "shell.execute_reply": "2024-09-07T04:07:05.457693Z"
+    },
+    "papermill": {
+     "duration": 0.022108,
+     "end_time": "2024-09-07T04:07:05.462789",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:05.440681",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "100"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "rf_obj = pipeline.named_steps['random_forest']\n",
+    "len(rf_obj.estimators_)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "08b77a7a",
+   "metadata": {
+    "execution": {
+     "iopub.execute_input": "2024-09-07T04:07:05.482772Z",
+     "iopub.status.busy": "2024-09-07T04:07:05.481936Z",
+     "iopub.status.idle": "2024-09-07T04:07:05.488507Z",
+     "shell.execute_reply": "2024-09-07T04:07:05.486786Z"
+    },
+    "papermill": {
+     "duration": 0.020859,
+     "end_time": "2024-09-07T04:07:05.491872",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:05.471013",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "#Basic operation are already done\n",
+    "#Now need to do advanced options\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "092ca3df",
+   "metadata": {
+    "papermill": {
+     "duration": 0.007406,
+     "end_time": "2024-09-07T04:07:05.508615",
+     "exception": false,
+     "start_time": "2024-09-07T04:07:05.501209",
+     "status": "completed"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kaggle": {
+   "accelerator": "none",
+   "dataSources": [
+    {
+     "datasetId": 3065197,
+     "sourceId": 5266275,
+     "sourceType": "datasetVersion"
+    }
+   ],
+   "dockerImageVersionId": 30761,
+   "isGpuEnabled": false,
+   "isInternetEnabled": true,
+   "language": "python",
+   "sourceType": "notebook"
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.14"
+  },
+  "papermill": {
+   "default_parameters": {},
+   "duration": 10.200141,
+   "end_time": "2024-09-07T04:07:06.241660",
+   "environment_variables": {},
+   "exception": null,
+   "input_path": "__notebook__.ipynb",
+   "output_path": "__notebook__.ipynb",
+   "parameters": {},
+   "start_time": "2024-09-07T04:06:56.041519",
+   "version": "2.6.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
